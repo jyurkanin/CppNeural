@@ -1,0 +1,3 @@
+add_subdirectory(cpp_bptt_lib)
+add_subdirectory(cpp_neural_lib)
+add_subdirectory(circle_demo)

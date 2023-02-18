@@ -106,5 +106,6 @@ void DenseLayer<Scalar>::zeroBias()
   }
 }
 
+template class DenseLayer<float>;
 template class DenseLayer<ADF>;
 template class DenseLayer<ADAD>;

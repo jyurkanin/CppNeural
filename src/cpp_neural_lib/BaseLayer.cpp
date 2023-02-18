@@ -19,5 +19,8 @@ int BaseLayer<Scalar>::getNumInputs(){return m_num_in;}
 template<typename Scalar>
 int BaseLayer<Scalar>::getNumOutputs(){return m_num_out;}
 
+
+
+template class BaseLayer<float>;
 template class BaseLayer<ADF>;
 template class BaseLayer<ADAD>;
