@@ -3,7 +3,7 @@
 
 namespace helpers
 {
-
+  
 template<typename Scalar>
 void getSpread(Scalar price, Scalar &spread_buy, Scalar &spread_sell);
 

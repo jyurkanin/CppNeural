@@ -9,7 +9,3 @@ typedef CppAD::cg::CG<float> CGF;
 typedef CppAD::AD<CGF> ADCF;
 typedef CppAD::AD<ADCF> ADAD;
 typedef CppAD::AD<float> ADF;
-
-
-
-//typedef ADF Scalar; //for now...

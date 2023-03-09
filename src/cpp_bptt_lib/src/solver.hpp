@@ -1,9 +1,10 @@
 #include <Eigen/Dense>
-#include <cppad/cg.hpp>
-#include <cppad/cppad.hpp>
 
 template<typename Scalar>
-void ODE(const Eigen::Matrix<Scalar,Eigen::Dynamic,1> &X, Eigen::Matrix<Scalar,Eigen::Dynamic,1> &Xd, const Eigen::Matrix<Scalar,Eigen::Dynamic,1> &theta){
+void ODE(const Eigen::Matrix<Scalar,Eigen::Dynamic,1> &X,
+	       Eigen::Matrix<Scalar,Eigen::Dynamic,1> &Xd,
+	 const Eigen::Matrix<Scalar,Eigen::Dynamic,1> &theta)
+{
   Xd[0] = theta[0]*X[1] + theta[4]*X[0];
   Xd[1] = -X[0] + theta[1]*X[1] - (theta[2]*X[1]*X[0]*X[0]) + (theta[3]*X[0]*X[0]*X[0]);
 }

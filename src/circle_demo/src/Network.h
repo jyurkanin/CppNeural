@@ -1,5 +1,5 @@
-#include <cpp_neural/src/cpp_neural.h>
-#include "types.h"
+#include <cpp_neural.h>
+#include <types/Tensors.h>
 #include <iostream>
 
 

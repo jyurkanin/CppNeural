@@ -2,6 +2,7 @@
 #include "types/Scalars.h"
 #include "BaseLayer.h"
 
+#pragma once
 
 //I've decided this is Just going to compute a softmax.
 template<typename Scalar>

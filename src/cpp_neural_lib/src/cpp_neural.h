@@ -5,3 +5,5 @@
 #include "ConvLayer.h"
 #include "RecurrentLayer.h"
 #include "helpers.h"
+#include "types/Scalars.h"
+#include "types/Tensors.h"

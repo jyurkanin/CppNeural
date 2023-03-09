@@ -4,17 +4,24 @@
 #include <stdlib.h>
 
 
-MainWindow::MainWindow() : network(2,4,2), network_f(2,4,2){
+MainWindow::MainWindow()
+{
   int argc = 0;
   char **argv = 0;
   
   m_width = 1024;
   m_height = 1024;
 
-  m_num_params = network.getNumParams();
+  m_system->setNumSteps(1000);
+  m_system->setTimestep(.01);
+  m_system->setLearningRate(.001);
+  
+  m_num_params = m_system.getNumParams();
   m_params = -.01*VectorF::Random(m_num_params, 1);
   m_d_squared_params = VectorF::Zero(m_num_params, 1);
-
+  
+  m_state_dim = m_system.getStateDim();
+  
   m_x0 = 2*MatrixAD::Random(m_state_dim, m_batch_size) - (MatrixAD::Ones(m_state_dim, m_batch_size));
 
   float starting_radius = .1;
@@ -84,8 +91,7 @@ void MainWindow::train()
   CppAD::Independent(ad_params);
   
   // Load params into the ffwd model
-  int idx = 0;
-  network.setParams(ad_params, idx);
+  m_system.setParams(ad_params);
   
   MatrixAD x_k = m_new_x0; //4*MatrixAD::Random(m_state_dim, m_batch_size) - (2*MatrixAD::Ones(m_state_dim, m_batch_size));
   MatrixAD x_k1(m_state_dim,m_batch_size);
@@ -96,7 +102,7 @@ void MainWindow::train()
   ADF radius_sum = 0;
   for(int j = 0; j < m_num_train_steps; j++)
   {
-    network.process(xd, x_k);
+    m_system.forward(x_k, xd);
     
     x_k1 = x_k + xd*m_step_size;
 
@@ -162,21 +168,18 @@ void MainWindow::train()
 void MainWindow::drawODEs()
 {
   
-  MatrixF x_k = MatrixF::Random(m_state_dim,m_num_drawings);
-  MatrixF x_k1(m_state_dim,m_num_drawings);
-  MatrixF xd(m_state_dim,m_num_drawings);
+  MatrixAD x_k = MatrixF::Random(m_state_dim,m_num_drawings);
+  MatrixAD x_k1(m_state_dim,m_num_drawings);
+  MatrixAD xd(m_state_dim,m_num_drawings);
 
   for(int i = 0; i < m_new_x0.rows(); i++)
   {
     x_k(i,0) = CppAD::Value(m_new_x0(i,0));
   }
   
-  int idx = 0;
-  network_f.setParams(m_params, idx);
-  
   for(int i = 0; i < m_num_draw_steps; i++)
   {
-    network_f.process(xd, x_k);
+    m_system.forward(x_k, xd);
     
     x_k = x_k + xd*m_step_size;
 
@@ -186,7 +189,7 @@ void MainWindow::drawODEs()
       float green = 1 - red;
       float blue = 0;
       
-      drawPixel(x_k(0,j), x_k(1,j), red,green,blue);
+      drawPixel(CppAD::Value(x_k(0,j)), CppAD::Value(x_k(1,j)), red,green,blue);
     }
   }
 }

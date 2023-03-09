@@ -1,5 +1,7 @@
 #include <SDL2/SDL.h>
-#include "Network.h"
+#include "CircleSystem.h"
+#include "CircleSimulator.h"
+
 
 class MainWindow
 {
@@ -27,7 +29,7 @@ private:
   unsigned int *m_pixels;
 
   int m_cnt = 0;
-
+  
   static constexpr int m_update_interval = 64;
   static constexpr float m_target_radius = 0.1f;
   static constexpr float m_lr = 1e-3f;
@@ -36,9 +38,9 @@ private:
   static constexpr int m_num_train_steps = 2048;
   static constexpr int m_batch_size = 4;
   static constexpr int m_num_drawings = 4;
-  static constexpr int m_state_dim = 2;
   static constexpr int m_num_hidden_nodes = 8;
-
+  
+  int m_state_dim = 2;
   
   int m_num_params;
   VectorF m_params;
@@ -46,6 +48,5 @@ private:
   MatrixAD m_x0;
   MatrixAD m_new_x0;
 
-  Network<ADF> network;
-  Network<float> network_f;
+  CircleSystem<ADF> m_system;
 };

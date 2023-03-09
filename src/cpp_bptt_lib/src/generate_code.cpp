@@ -1,24 +1,17 @@
-#include <SDL2/SDL.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-#include <cppad/cg.hpp>
 #include <Eigen/Dense>
+#include <iostream>
+#include <memory>
 
-#include "solver.hpp"
-//#include "system_solver.h"
+#include "Generator.h"
+#include "Simulator.h"
+#include "SimulatorCodeGen.h"
 
 using namespace CppAD;
 using namespace CppAD::cg;
 
-typedef CG<float> CGF;
-typedef AD<CGF> ADCF;
 
 
 int generate_sources(){
-  typedef AD<ADCF> ADAD; //Oh my god.
-  
   Eigen::Matrix<ADAD,Eigen::Dynamic,1> y_adad(1);
   Eigen::Matrix<ADAD,Eigen::Dynamic,1> x_init(2);
   Eigen::Matrix<ADAD,Eigen::Dynamic,1> theta(6);
@@ -90,10 +83,4 @@ int generate_sources(){
   std::ofstream output_file("system.cpp");
   output_file << code.str();
   output_file.close();
-}
-
-
-int main(){
-  generate_sources();
-  //test_generated_source();
 }

@@ -1,12 +1,41 @@
+add_executable(
+  runUnitTests
+  test/test_NormLayer.cpp
+  test/test_ConvLayer.cpp
+  
+  src/helpers.cpp
+  src/FinalLayer.cpp
+  src/DenseLayer.cpp
+  src/NormLayer.cpp
+  src/BaseLayer.cpp
+  src/ConvLayer.cpp
+  src/RecurrentLayer.cpp
+  src/CSVHandler.cpp
+  src/types/Scalars.h
+  src/types/Tensors.h
+  )
+
+target_link_libraries(
+  runUnitTests
+  GTest::gtest_main
+)
+
+include(GoogleTest)
+gtest_discover_tests(runUnitTests)
+
+
+
 add_library(cpp_neural
-  helpers.cpp
-  FinalLayer.cpp
-  DenseLayer.cpp
-  NormLayer.cpp
-  BaseLayer.cpp
-  ConvLayer.cpp
-  RecurrentLayer.cpp
-  CSVHandler.cpp
+  src/helpers.cpp
+  src/FinalLayer.cpp
+  src/DenseLayer.cpp
+  src/NormLayer.cpp
+  src/BaseLayer.cpp
+  src/ConvLayer.cpp
+  src/RecurrentLayer.cpp
+  src/CSVHandler.cpp
+  src/types/Scalars.h
+  src/types/Tensors.h
   )
 
 install(
