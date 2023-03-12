@@ -1,7 +1,12 @@
+#pragma once
+
 #include <types/Tensors.h>
 #include <types/Scalars.h>
 #include "SimulatorADAD.h"
 #include <memory>
+
+namespace cpp_bptt
+{
 
 // Generates something.
 class Generator
@@ -22,3 +27,6 @@ private:
 
   std::shared_ptr<SimulatorADAD> m_simulator;
 };
+
+
+} // cpp_bptt

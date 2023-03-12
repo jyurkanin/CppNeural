@@ -15,8 +15,8 @@ class NormLayer : public BaseLayer<Scalar>
   virtual ~NormLayer();
 
   virtual void process(Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> &controls, const Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> &input);
-  virtual void getParams(Eigen::Matrix<float, Eigen::Dynamic, 1>& params, int &idx);
-  virtual void setParams(Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx);
+  virtual void getParams(Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx);
+  virtual void setParams(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx);
   virtual unsigned getNumParams();
   virtual void reset();
   virtual void zeroBias();
@@ -29,6 +29,3 @@ class NormLayer : public BaseLayer<Scalar>
   Eigen::Matrix<Scalar, Eigen::Dynamic, 1> m_mean;
   Eigen::Matrix<Scalar, Eigen::Dynamic, 1> m_stddev;
 };
-
-template<>
-void NormLayer<ADF>::getParams(Eigen::Matrix<float, Eigen::Dynamic, 1>& params, int &idx);

@@ -1,4 +1,8 @@
 #include "SimpleSystem.h"
+#include <iostream>
+
+namespace cpp_bptt
+{
 
 template<typename Scalar>
 SimpleSystem<Scalar>::SimpleSystem() : m_params(2,2), System<Scalar>(2,1)
@@ -48,7 +52,10 @@ Scalar SimpleSystem<Scalar>::loss(const VectorS &gt_vec, VectorS &vec)
     Scalar err = gt_vec[i] - vec[i];
     sum += err*err;
   }
-  return sum;
+
+  VectorS Xd(2);
+  forward(vec, Xd);
+  return sum + Xd[0] + Xd[1];
 }
 
 
@@ -56,3 +63,4 @@ template class SimpleSystem<float>;
 template class SimpleSystem<ADF>;
 template class SimpleSystem<ADAD>;
 
+} //cpp_bptt

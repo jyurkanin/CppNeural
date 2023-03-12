@@ -9,6 +9,9 @@
 // The state can be augmented to include the necessary gradients?
 
 
+namespace cpp_bptt
+{
+
 template<typename Scalar>
 class System
 {
@@ -58,3 +61,6 @@ private:
   float m_timestep;
   float m_lr;
 };
+
+}
+  

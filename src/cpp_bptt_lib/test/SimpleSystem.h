@@ -2,6 +2,9 @@
 #include <types/Scalars.h>
 #include <types/Tensors.h>
 
+namespace cpp_bptt
+{
+
 template <typename Scalar>
 class SimpleSystem : public System<Scalar>
 {
@@ -21,3 +24,5 @@ public:
 private:
   MatrixS m_params;
 };
+
+} //cpp_bptt

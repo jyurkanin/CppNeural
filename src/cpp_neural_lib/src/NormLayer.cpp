@@ -47,10 +47,7 @@ void NormLayer<Scalar>::process(Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dyn
 
 
 template<typename Scalar>
-void NormLayer<Scalar>::getParams(Eigen::Matrix<float, Eigen::Dynamic, 1>& params, int &idx){}
-
-template<typename Scalar>
-void NormLayer<Scalar>::setParams(Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx){}
+void NormLayer<Scalar>::setParams(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx){}
 
 template<typename Scalar>
 unsigned NormLayer<Scalar>::getNumParams(){return 0;}
@@ -63,11 +60,12 @@ void NormLayer<Scalar>::zeroBias(){}
 
 
 
-template<>
-void NormLayer<ADF>::getParams(Eigen::Matrix<float, Eigen::Dynamic, 1>& params, int &idx)
+template<typename Scalar>
+void NormLayer<Scalar>::getParams(Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx)
 {
 
 }
 
+template class NormLayer<float>;
 template class NormLayer<ADF>;
 template class NormLayer<ADAD>;

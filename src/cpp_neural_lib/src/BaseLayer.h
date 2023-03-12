@@ -11,8 +11,8 @@ class BaseLayer
   virtual ~BaseLayer();
 
   virtual void process(Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> &controls, const Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> &input) = 0;
-  virtual void getParams(Eigen::Matrix<float, Eigen::Dynamic, 1>& params, int &idx) = 0;
-  virtual void setParams(Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx) = 0;
+  virtual void getParams(Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx) = 0;
+  virtual void setParams(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx) = 0;
   virtual unsigned getNumParams() = 0;
   virtual void zeroBias() = 0;
   

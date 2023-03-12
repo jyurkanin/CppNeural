@@ -77,12 +77,7 @@ void ConvLayer<Scalar>::process(Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dyn
 }
 
 template<typename Scalar>
-void ConvLayer<Scalar>::getParams(Eigen::Matrix<float, Eigen::Dynamic, 1>& params, int &idx)
-{
-}
-
-template<typename Scalar>
-void ConvLayer<Scalar>::setParams(Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx)
+void ConvLayer<Scalar>::setParams(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx)
 {
   for(int k = 0; k < m_num_filters; k++)
   {
@@ -135,8 +130,8 @@ const std::vector<Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>>& ConvLa
 }
 
 
-template<>
-void ConvLayer<ADF>::getParams(Eigen::Matrix<float, Eigen::Dynamic, 1>& params, int &idx)
+template<typename Scalar>
+void ConvLayer<Scalar>::getParams(Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx)
 {
   for(int k = 0; k < m_num_filters; k++)
   {
@@ -144,7 +139,7 @@ void ConvLayer<ADF>::getParams(Eigen::Matrix<float, Eigen::Dynamic, 1>& params, 
     {
       for(int j = 0; j < m_filter_size; j++)
       {
-        params[idx] = CppAD::Value(m_filters[k](i,j));
+        params[idx] = m_filters[k](i,j);
         idx++;
       }
     }
@@ -152,7 +147,7 @@ void ConvLayer<ADF>::getParams(Eigen::Matrix<float, Eigen::Dynamic, 1>& params, 
 
   for(int i = 0; i < m_num_filters; i++)
   {
-    params[idx] = CppAD::Value(m_biases[i]);
+    params[idx] = m_biases[i];
     idx++;
   }
 }

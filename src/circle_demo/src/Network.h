@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cpp_neural.h>
 #include <types/Tensors.h>
 #include <iostream>
@@ -47,13 +49,13 @@ public:
     m_dense_layer2.process(controls, layer1_out);            //helpers::applyTanh(controls);
   }
   
-  void getParams(Eigen::Matrix<float, Eigen::Dynamic, 1>& params, int &idx)
+  void getParams(Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx)
   {
     m_dense_layer1.getParams(params, idx);
     m_dense_layer2.getParams(params, idx);
   }
   
-  void setParams(Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx)
+  void setParams(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx)
   {
     m_dense_layer1.setParams(params, idx);
     m_dense_layer2.setParams(params, idx);

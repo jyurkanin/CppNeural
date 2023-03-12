@@ -15,8 +15,8 @@ class DenseLayer : public BaseLayer<Scalar>
   ~DenseLayer();
 
   void process(Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> &controls, const Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> &input);
-  void getParams(Eigen::Matrix<float, Eigen::Dynamic, 1>& params, int &idx);
-  void setParams(Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx);
+  void getParams(Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx);
+  void setParams(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx);
   unsigned getNumParams();
   void zeroBias();
   
@@ -29,6 +29,3 @@ class DenseLayer : public BaseLayer<Scalar>
   Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> m_weights;
   Eigen::Matrix<Scalar, Eigen::Dynamic, 1> m_biases;
 };
-
-template<>
-void DenseLayer<ADF>::getParams(Eigen::Matrix<float, Eigen::Dynamic, 1>& params, int &idx);

@@ -3,6 +3,8 @@
 
 #include <memory>
 
+namespace cpp_bptt
+{
 
 /*
  * There will be two versions of this class. SimulatorAD, SimulatorCodeGen
@@ -107,3 +109,8 @@ private:
   }
 
 };
+
+}
+
+
+  

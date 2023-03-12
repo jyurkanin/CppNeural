@@ -8,26 +8,29 @@ MainWindow::MainWindow()
 {
   int argc = 0;
   char **argv = 0;
+
+  m_system = std::make_shared<CircleSystem<float>>();
+  m_system->setNumSteps(m_num_train_steps);
+  m_system->setTimestep(.1);
+  m_system->setLearningRate(m_lr);
+  
+  m_simulator = std::make_shared<CircleSimulator>(m_system);
   
   m_width = 1024;
   m_height = 1024;
-
-  m_system->setNumSteps(1000);
-  m_system->setTimestep(.01);
-  m_system->setLearningRate(.001);
   
-  m_num_params = m_system.getNumParams();
+  m_num_params = m_system->getNumParams();
   m_params = -.01*VectorF::Random(m_num_params, 1);
   m_d_squared_params = VectorF::Zero(m_num_params, 1);
   
-  m_state_dim = m_system.getStateDim();
+  m_state_dim = m_system->getStateDim();
   
-  m_x0 = 2*MatrixAD::Random(m_state_dim, m_batch_size) - (MatrixAD::Ones(m_state_dim, m_batch_size));
+  m_x0 = 2*MatrixF::Random(m_state_dim, m_batch_size) - (MatrixF::Ones(m_state_dim, m_batch_size));
 
   float starting_radius = .1;
   for(int i = 0; i < m_x0.cols(); i++)
   {
-    ADF norm = CppAD::sqrt((m_x0(0,i)*m_x0(0,i)) + (m_x0(1,i)*m_x0(1,i)));
+    float norm = (m_x0(0,i)*m_x0(0,i)) + (m_x0(1,i)*m_x0(1,i));
     m_x0(0,i) = starting_radius*m_x0(0,i)/norm;
     m_x0(1,i) = starting_radius*m_x0(1,i)/norm;
   }
@@ -81,117 +84,101 @@ int MainWindow::del()
 }
 
 void MainWindow::train()
-{ 
-  VectorAD ad_params(m_params.size());
-  for(int i = 0; i < m_params.size(); i++)
+{
+  VectorF x0(m_system->getStateDim());
+  std::vector<VectorF> gt_list(m_system->getNumSteps());
+  VectorF d_params(m_system->getNumParams());
+  VectorF d_params_sum = VectorF::Zero(m_system->getNumParams());
+  float loss;
+  
+  for(int i = 0; i < gt_list.size(); i++)
   {
-    ad_params[i] = m_params[i];
+    gt_list[i] = VectorF::Zero(m_system->getStateDim());
   }
-  
-  CppAD::Independent(ad_params);
-  
-  // Load params into the ffwd model
-  m_system.setParams(ad_params);
-  
-  MatrixAD x_k = m_new_x0; //4*MatrixAD::Random(m_state_dim, m_batch_size) - (2*MatrixAD::Ones(m_state_dim, m_batch_size));
-  MatrixAD x_k1(m_state_dim,m_batch_size);
-  MatrixAD xd(m_state_dim,m_batch_size);
-  
-  ADF score = 0;
-  ADF diff_sum = 0;
-  ADF radius_sum = 0;
-  for(int j = 0; j < m_num_train_steps; j++)
-  {
-    m_system.forward(x_k, xd);
-    
-    x_k1 = x_k + xd*m_step_size;
 
-    if(j == 16){
-      if (m_cnt == m_update_interval) {
-        // m_new_x0(0,0) = x_k(0,0);
-        // m_new_x0(1,0) = x_k(1,0);
-        m_new_x0 = x_k;
-        m_cnt = 0;
+  m_simulator->setParams(m_params);
+  
+  for(int j = 0; j < m_batch_size; j++)
+  {
+    if(j == 0) // draw 1 the same.
+    {
+      for(int k = 0; k < m_new_x0.rows(); k++)
+      {
+	x0[k] = m_new_x0(k,0);
       }
     }
-
-    for(int i = 0; i < x_k1.cols(); i++)
+    else // draw the others randomly
     {
-      ADF radius = CppAD::sqrt(x_k1(0,i)*x_k1(0,i) + x_k1(1,i)*x_k1(1,i));
-      ADF dx = m_target_radius - x_k1(0,i);
-      ADF dy = m_target_radius - x_k1(1,i);
-
-      ADF dr = m_target_radius - radius;
-      radius_sum += dr*dr;
-      // radius_sum += dx*dx + dy*dy;
-      
-      /* dx = -m_target_radius - x_k1(0,i); */
-      /* dy = -m_target_radius - x_k1(1,i); */
-      /* radius_sum += dx*dx + dy*dy; */
-      
-      //ADF norm = CppAD::sqrt(xd(0,i)*xd(0,i) + xd(1,i)*xd(1,i));
-      //diff_sum += CppAD::exp(-10*norm);
-
-      ADF norm = CppAD::exp(-10*(CppAD::abs(xd(0,i)) + CppAD::abs(xd(1,i))));
-      diff_sum += norm;
+      x0 = VectorF::Random(m_state_dim);
     }
     
-    x_k = x_k1;
+    m_simulator->forward_backward(x0, gt_list, d_params, loss);
+    d_params_sum += d_params;
   }
-  
-  score = radius_sum + 1e-1f*diff_sum;
-  
-  VectorAD y(1);
-  y[0] = score / (float) m_batch_size;
-  CppAD::ADFun<float> func(ad_params, y);
 
-  std::cout << "Score " << CppAD::Value(score) << ", " << CppAD::Value(radius_sum) << ", " << CppAD::Value(diff_sum) << "\n";
+  VectorF d_params_avg = d_params_sum / m_batch_size;
   
-  VectorF y0(1);
-  y0[0] = 1;
-  VectorF d_params = func.Reverse(1, y0);
+  std::cout << "Score " << loss << "\n";
   
   // RMS Grad. Works way better than gradient descent.
   for(int i = 0; i < m_params.size(); i++)
   {
-    m_d_squared_params[i] = (.9*m_d_squared_params[i]) + (.1*d_params[i]*d_params[i]);
+    m_d_squared_params[i] = (.9*m_d_squared_params[i]) + (.1*d_params_avg[i]*d_params_avg[i]);
   }
   
   for(int i = 0; i < m_params.size(); i++)
   {
-    m_params[i] -= (m_lr / (sqrtf(m_d_squared_params[i]) + 1e-6f)) * d_params[i];
+    m_params[i] -= (m_lr / (sqrtf(m_d_squared_params[i]) + 1e-6f)) * d_params_avg[i];
   }
   
-  m_cnt++;
 }
 
 void MainWindow::drawODEs()
 {
+  VectorF x_k1(m_state_dim);
+  VectorF x_k(m_state_dim);
   
-  MatrixAD x_k = MatrixF::Random(m_state_dim,m_num_drawings);
-  MatrixAD x_k1(m_state_dim,m_num_drawings);
-  MatrixAD xd(m_state_dim,m_num_drawings);
-
-  for(int i = 0; i < m_new_x0.rows(); i++)
+  m_simulator->setParams(m_params);
+  for(int j = 0; j < m_batch_size; j++)
   {
-    x_k(i,0) = CppAD::Value(m_new_x0(i,0));
-  }
-  
-  for(int i = 0; i < m_num_draw_steps; i++)
-  {
-    m_system.forward(x_k, xd);
-    
-    x_k = x_k + xd*m_step_size;
 
-    for(int j = 0; j < x_k.cols(); j++)
+    // set initial state
+    if(j == 0) // draw 1 the same.
     {
-      float red = ((float)j / x_k.cols());
+      for(int k = 0; k < m_new_x0.rows(); k++)
+      {
+	x_k[k] = m_new_x0(k,0);
+      }
+    }
+    else // draw the others randomly
+    {
+      x_k = VectorF::Random(m_state_dim);
+    }
+    
+    for(int i = 0; i < m_num_draw_steps; i++)
+    {
+      m_simulator->integrate(x_k, x_k1);
+
+      if(m_cnt == m_update_interval && j == 0 && i == 16)
+      {
+	m_cnt = 0;
+	for(int m = 0; m < m_new_x0.rows(); m++)
+	{
+	  m_new_x0(m,0) = x_k[m];
+	}
+
+      }
+      
+      float red = ((float)j / m_batch_size);
       float green = 1 - red;
       float blue = 0;
-      
-      drawPixel(CppAD::Value(x_k(0,j)), CppAD::Value(x_k(1,j)), red,green,blue);
+      drawPixel(x_k1[0], x_k1[1], red,green,blue);
+
+      x_k = x_k1;
     }
   }
+  
+  m_cnt++;
 }
 
 void MainWindow::drawCircle(float radius)
@@ -222,7 +209,6 @@ void MainWindow::drawPixel(float x, float y, float red, float green, float blue)
 void MainWindow::loop()
 {
   SDL_Surface *window_surface = SDL_GetWindowSurface(m_window);
-  
   SDL_Event event;
   while (SDL_PollEvent(&event)) {
     if (event.type == SDL_QUIT){
@@ -245,11 +231,18 @@ void MainWindow::loop()
 
   train();
 
-  SDL_FillRect(window_surface, NULL, 0);
-  drawODEs();
-  drawCircle(m_target_radius);
-  drawPixel(-m_target_radius, -m_target_radius, 1,1,1);
-  drawPixel(m_target_radius, m_target_radius, 1,1,1);
   
-  SDL_UpdateWindowSurface(m_window);
+
+  if(m_cnt_2 == 32)
+  {
+    m_cnt_2 = 0;
+    SDL_FillRect(window_surface, NULL, 0);
+    drawODEs();
+    drawCircle(m_target_radius);
+    drawPixel(-m_target_radius, -m_target_radius, 1,1,1);
+    drawPixel(m_target_radius, m_target_radius, 1,1,1);
+  
+    SDL_UpdateWindowSurface(m_window);
+  }
+  m_cnt_2++;
 }

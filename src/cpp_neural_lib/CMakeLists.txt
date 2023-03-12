@@ -1,5 +1,5 @@
 add_executable(
-  runUnitTests
+  runUnitTests_nn
   test/test_NormLayer.cpp
   test/test_ConvLayer.cpp
   
@@ -16,12 +16,12 @@ add_executable(
   )
 
 target_link_libraries(
-  runUnitTests
+  runUnitTests_nn
   GTest::gtest_main
 )
 
 include(GoogleTest)
-gtest_discover_tests(runUnitTests)
+gtest_discover_tests(runUnitTests_nn)
 
 
 

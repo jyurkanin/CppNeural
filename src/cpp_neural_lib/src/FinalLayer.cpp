@@ -49,23 +49,20 @@ void FinalLayer<Scalar>::process(Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dy
 
 
 template<typename Scalar>
-void FinalLayer<Scalar>::getParams(Eigen::Matrix<float, Eigen::Dynamic, 1>& params, int &idx){}
-
-
-template<>
-void FinalLayer<ADF>::getParams(Eigen::Matrix<float, Eigen::Dynamic, 1>& params, int &idx)
+void FinalLayer<Scalar>::getParams(Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx)
 {
-    params[idx+0] = CppAD::Value(m1);
+    params[idx+0] = m1;
     idx += getNumParams();
 }
 
 template<typename Scalar>
-void FinalLayer<Scalar>::setParams(Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx)
+void FinalLayer<Scalar>::setParams(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx)
 {
     m1 = params[idx+0];
     idx += getNumParams();
 }
 
 
+template class FinalLayer<float>;
 template class FinalLayer<ADF>;
 template class FinalLayer<ADAD>;

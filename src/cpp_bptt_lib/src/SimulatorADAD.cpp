@@ -1,5 +1,8 @@
 #include "SimulatorADAD.h"
 
+namespace cpp_bptt
+{
+
 SimulatorADAD::SimulatorADAD(std::shared_ptr<System<ADAD>> sys) : Simulator<ADAD>(sys)
 {
   m_timestep = sys->getTimestep();
@@ -23,18 +26,5 @@ void SimulatorADAD::forward_backward(const VectorF &x0,
 {
   
 }
-
-void SimulatorADAD::computePartialLossState(const VectorF &gt_x1, const VectorF &x1, VectorF &loss_x1_partial)
-{
-  
-}
-
-void SimulatorADAD::computePartialStatePrevState(const VectorF &xk, const VectorF &theta, MatrixF &x1_x_partial, VectorF &xk1)
-{
-
-}
-
-void SimulatorADAD::computePartialStateParams(const VectorF &x, const VectorF &theta, MatrixF &x1_theta_partial)
-{
 
 }

@@ -7,12 +7,18 @@
 
 #include "gtest/gtest.h"
 
+#include <stdlib.h>
+#include <time.h>
+
 namespace {
+
+  using namespace cpp_bptt;
   
   class SimpleSystemFixture : public ::testing::Test
   {
   public:
     std::vector<VectorF> m_gt_list;
+    std::vector<VectorAD> m_gt_list_adf;
     VectorF m_x0;
     VectorF m_params;
     
@@ -23,6 +29,8 @@ namespace {
     
     SimpleSystemFixture()
     {
+      srand(time(NULL)); // randomize seed
+      
       m_system_adf = std::make_shared<SimpleSystem<ADF>>();
       m_simulator_adf = std::make_shared<SimulatorAD>(m_system_adf);
       
@@ -32,10 +40,16 @@ namespace {
       m_params = VectorF::Random(m_system_adf->getNumParams());
       m_x0 = VectorF::Random(m_system_adf->getStateDim());
       m_gt_list.resize(m_system_adf->getNumSteps());
+      m_gt_list_adf.resize(m_system_adf->getNumSteps());
 
       for(int i = 0; i < m_gt_list.size(); i++)
       {
 	m_gt_list[i] = VectorF::Random(m_system_f->getStateDim());
+	m_gt_list_adf[i] = VectorAD::Zero(m_system_f->getStateDim());
+	for(int j = 0; j < m_x0.size(); j++)
+	{
+	  m_gt_list_adf[i][j] = m_gt_list[i][j]; 
+	}
       }
       
       std::cout << "constructor\n";
@@ -66,13 +80,9 @@ namespace {
       
       loss[0] = 0;
       for(int i = 0; i < x_list.size(); i++)
-	{
-	  for(int j = 0; j < m_system_adf->getStateDim(); j++)
-	    {
-	      ADF err = x_list[i][j] - m_gt_list[i][j];
-	      loss[0] += err*err;
-	    }
-	}
+      {
+	loss[0] += m_system_adf->loss(m_gt_list_adf[i], x_list[i]);
+      }
       
       CppAD::ADFun<float> func(params, loss);
       
@@ -152,6 +162,21 @@ namespace {
     {
       std::cout << grad_simple[i] << ", " << grad_hard[i] << "\n";
       EXPECT_LE(fabs(grad_simple[i] - grad_hard[i]), fabs(1e-4f*grad_simple[i]));
+    }
+  }
+
+  TEST_F(SimpleSystemFixture, validate_gradient_both)
+  {
+    VectorF grad_simple = getGradientSimple();
+    VectorF grad_bptt = getGradientBPTT();
+    VectorF grad_hard = getGradientHard();
+    
+    
+    for(int i = 0; i < m_system_f->getNumParams(); i++)
+    {
+      std::cout << grad_simple[i] << ", " << grad_bptt[i] << "," << grad_hard[i] << "\n";
+      EXPECT_LE(fabs(grad_simple[i] - grad_hard[i]), fabs(1e-4f*grad_simple[i]));
+      EXPECT_LE(fabs(grad_simple[i] - grad_bptt[i]), fabs(1e-4f*grad_simple[i]));
     }
   }
 

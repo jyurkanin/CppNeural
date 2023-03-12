@@ -66,12 +66,7 @@ void RecurrentLayer<Scalar>::process(Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen
 }
 
 template<typename Scalar>
-void RecurrentLayer<Scalar>::getParams(Eigen::Matrix<float, Eigen::Dynamic, 1>& params, int &idx)
-{
-}
-
-template<typename Scalar>
-void RecurrentLayer<Scalar>::setParams(Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx)
+void RecurrentLayer<Scalar>::setParams(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx)
 {
   for(int i = 0; i < m_weights.rows(); i++)
   {
@@ -97,24 +92,27 @@ unsigned RecurrentLayer<Scalar>::getNumParams()
 }
 
 
-template<>
-void RecurrentLayer<ADF>::getParams(Eigen::Matrix<float, Eigen::Dynamic, 1>& params, int &idx)
+template<typename Scalar>
+void RecurrentLayer<Scalar>::getParams(Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params, int &idx)
 {
   for(int i = 0; i < m_weights.rows(); i++)
     {
       for(int j = 0; j < m_weights.cols(); j++)
         {
-          params[idx] = CppAD::Value(m_weights(i,j));
+          params[idx] = m_weights(i,j);
           idx++;
         }
     }
 
   for(int i = 0; i < m_biases.rows(); i++)
     {
-      params[idx] = CppAD::Value(m_biases[i]);
+      params[idx] = m_biases[i];
       idx++;
     }
 }
 
+
+
+template class RecurrentLayer<float>;
 template class RecurrentLayer<ADF>;
 template class RecurrentLayer<ADAD>;

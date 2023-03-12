@@ -1,5 +1,8 @@
 #include "SimulatorF.h"
 
+namespace cpp_bptt
+{
+
 SimulatorF::SimulatorF(std::shared_ptr<System<float>> sys) : Simulator<float>(sys)
 {
   
@@ -17,6 +20,7 @@ void SimulatorF::forward_backward(const VectorF &x0,
 {
   VectorF gradient_acc         = VectorF::Zero(m_num_params);
   VectorF loss_x1_partial      = VectorF::Zero(m_state_dim);
+  VectorF loss_params_partial  = VectorF::Zero(m_num_params);
   
   MatrixF x1_x_partial_mat     = MatrixF::Zero(m_state_dim, m_state_dim);
   VectorF x1_x_partial_vec     = VectorF::Zero(m_state_dim * m_state_dim);
@@ -42,18 +46,25 @@ void SimulatorF::forward_backward(const VectorF &x0,
   for(int i = 0; i < m_num_steps; i++)
   {
     // Advance state, compute partial_state_state, compute partial_state_param
-    computePartials(xk0, m_params, xk1, x1_x_partial_vec, x1_theta_partial_vec);
+    computePartials(xk0,
+		    m_params,
+		    gt_list[i],
+		    xk1,
+		    x1_x_partial_vec,
+		    x1_theta_partial_vec,
+		    loss_params_partial,
+		    loss_x1_partial,
+		    loss_k);
+    
     m_system->unflatten(x1_x_partial_vec, x1_x_partial_mat);
     m_system->unflatten(x1_theta_partial_vec, x1_theta_partial_mat);
         
     // Compute next state param jacobian
     x1_theta_jacobian = (x1_x_partial_mat * x0_theta_jacobian) + x1_theta_partial_mat;
-    
-    computePartialLossState(gt_list[i], xk1, loss_x1_partial, loss_k);
     total_loss += loss_k;
     
     // Compute Loss param gradient
-    loss_theta_gradient = loss_x1_partial.transpose() * x1_theta_jacobian;
+    loss_theta_gradient = (loss_x1_partial.transpose() * x1_theta_jacobian).transpose() + loss_params_partial;
     gradient_acc += loss_theta_gradient;
     
     xk0 = xk1;
@@ -64,18 +75,4 @@ void SimulatorF::forward_backward(const VectorF &x0,
   loss = total_loss;
 }
 
-/*
-void SimulatorF::computePartialLossState(const VectorF &gt_x1, const VectorF &x1, VectorF &loss_x1_partial)
-{
-  
-}
-
-void SimulatorF::computePartials(const VectorF &xk0,
-				 const VectorF &theta,
-				 VectorF &xk1,
-				 VectorF &partial_state_state,
-				 VectorF &partial_state_param)
-{
-  
-}
-*/
+} //cpp_bptt
