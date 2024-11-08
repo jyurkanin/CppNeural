@@ -3,7 +3,7 @@
 namespace cpp_bptt
 {
 
-SimulatorSimpleSystem::SimulatorSimpleSystem(std::shared_ptr<System<float>> sys) : SimulatorF(sys) {}
+SimulatorSimpleSystem::SimulatorSimpleSystem(std::shared_ptr<System<double>> sys) : SimulatorF(sys) {}
 SimulatorSimpleSystem::~SimulatorSimpleSystem() {}
  
 void SimulatorSimpleSystem::computePartials(const VectorF &xk0,
@@ -14,11 +14,11 @@ void SimulatorSimpleSystem::computePartials(const VectorF &xk0,
 					    VectorF &partial_state_param,
 					    VectorF &partial_loss_params,
 					    VectorF &partial_loss_state,
-					    float   &loss)
+					    double   &loss)
 {
-   float x[8];
-   float y[21];
-   float v[12];
+   double x[8];
+   double y[21];
+   double v[12];
    int idx = 0;
    for(int i = 0; i < xk0.size(); i++)
    {

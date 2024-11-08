@@ -113,6 +113,6 @@ void RecurrentLayer<Scalar>::getParams(Eigen::Matrix<Scalar, Eigen::Dynamic, 1>&
 
 
 
-template class RecurrentLayer<float>;
+template class RecurrentLayer<double>;
 template class RecurrentLayer<ADF>;
 template class RecurrentLayer<ADAD>;

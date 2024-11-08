@@ -3,7 +3,7 @@
 namespace cpp_bptt
 {
 
-SimulatorF::SimulatorF(std::shared_ptr<System<float>> sys) : Simulator<float>(sys)
+SimulatorF::SimulatorF(std::shared_ptr<System<double>> sys) : Simulator<double>(sys)
 {
   
 }
@@ -16,7 +16,7 @@ SimulatorF::~SimulatorF()
 void SimulatorF::forward_backward(const VectorF &x0,
 				  const std::vector<VectorF> &gt_list,
 				  VectorF &gradient,
-				  float &loss)
+				  double &loss)
 {
   VectorF gradient_acc         = VectorF::Zero(m_num_params);
   VectorF loss_x1_partial      = VectorF::Zero(m_state_dim);
@@ -36,8 +36,8 @@ void SimulatorF::forward_backward(const VectorF &x0,
   VectorF xk0 = x0;
   VectorF xk1(m_state_dim);
   
-  float total_loss = 0;
-  float loss_k;
+  double total_loss = 0;
+  double loss_k;
   VectorF y0(1);
   y0[0] = 1;
   

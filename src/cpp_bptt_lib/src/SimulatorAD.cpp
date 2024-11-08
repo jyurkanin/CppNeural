@@ -40,7 +40,7 @@ void SimulatorAD::clearGradients()
 void SimulatorAD::forward_backward(const VectorF &x0,
 				   const std::vector<VectorF> &gt_list,
 				   VectorF &gradient,
-				   float &total_loss)
+				   double &total_loss)
 {
   VectorF gradient_acc         = VectorF::Zero(m_num_params);
   VectorF loss_x1_partial      = VectorF::Zero(m_state_dim);
@@ -159,7 +159,7 @@ void SimulatorAD::precomputePartialLossState()
 
   m_system->setParams(theta);
   loss[0] = m_system->loss(gt_x0, x0);
-  m_partial_loss_state = CppAD::ADFun<float>(x0,loss);
+  m_partial_loss_state = CppAD::ADFun<double>(x0,loss);
 }
 
 void SimulatorAD::precomputePartialLossParams()
@@ -168,9 +168,17 @@ void SimulatorAD::precomputePartialLossParams()
   VectorAD gt_x0(m_system->getStateDim());
   VectorAD loss(1);
   VectorAD dynamic_vars(x0.size() + gt_x0.size());
-  VectorAD theta(m_system->getNumParams());
+  VectorAD params(m_system->getNumParams());
+
+  m_system->getDefaultParams(params);
+  m_system->getDefaultInitialState(x0);
+  for(int i = 0; i < x0.size(); i++)
+  {
+    dynamic_vars[i] = x0[i];
+  }
+
   
-  CppAD::Independent(theta, dynamic_vars);
+  CppAD::Independent(params, dynamic_vars);
   int idx = 0;
   for(int i = 0; i < x0.size(); i++)
   {
@@ -183,9 +191,9 @@ void SimulatorAD::precomputePartialLossParams()
   }
   idx += gt_x0.size();
 
-  m_system->setParams(theta);
+  m_system->setParams(params);
   loss[0] = m_system->loss(gt_x0, x0);
-  m_partial_loss_params = CppAD::ADFun<float>(theta,loss);
+  m_partial_loss_params = CppAD::ADFun<double>(params,loss);
 }
 
   
@@ -195,11 +203,14 @@ void SimulatorAD::precomputePartialStatePrevState()
   VectorAD x1(m_system->getStateDim());
   VectorAD params(m_system->getNumParams());
   
+  m_system->getDefaultParams(params);
+  m_system->getDefaultInitialState(x0);
+  
   CppAD::Independent(x0, params);
 
   m_system->setParams(params);
   integrate(x0, x1);  
-  m_partial_state_prev_state = CppAD::ADFun<float>(x0,x1);
+  m_partial_state_prev_state = CppAD::ADFun<double>(x0,x1);
 }
 
 void SimulatorAD::precomputePartialStateParams()
@@ -212,7 +223,7 @@ void SimulatorAD::precomputePartialStateParams()
   
   m_system->setParams(params);
   integrate(x0, x1);
-  m_partial_state_params = CppAD::ADFun<float>(params,x1);
+  m_partial_state_params = CppAD::ADFun<double>(params,x1);
 }
 
 }

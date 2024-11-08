@@ -9,13 +9,13 @@
 class CircleSimulator : public cpp_bptt::SimulatorF
 {
 public:
-  CircleSimulator(std::shared_ptr<cpp_bptt::System<float>> sys);
+  CircleSimulator(std::shared_ptr<cpp_bptt::System<double>> sys);
   ~CircleSimulator();
 
   void computePartialLossState(const VectorF &gt_x1,
 			       const VectorF &x1,
 			       VectorF &loss_x1_partial,
-			       float &loss);
+			       double &loss);
 
   void computePartials(const VectorF &xk0,
 		       const VectorF &theta,
@@ -25,6 +25,6 @@ public:
 		       VectorF &partial_state_param,
 		       VectorF &partial_loss_params,
 		       VectorF &partial_loss_state,
-		       float   &loss);
+		       double   &loss);
 
 };

@@ -37,6 +37,9 @@ add_executable(
 
 add_library(cpp_bptt
 	src/Generator.cpp
+	src/SimulatorF.cpp
+	src/SimulatorAD.cpp
+	src/SimulatorADAD.cpp
 )
 
 install(

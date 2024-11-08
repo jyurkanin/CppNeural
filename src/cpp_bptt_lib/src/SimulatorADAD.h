@@ -15,7 +15,7 @@ public:
   virtual void forward_backward(const VectorF &x0,
 				const std::vector<VectorF> &gt_list,
 				VectorF &gradient,
-				float &loss);
+				double &loss);
 };
 
 

@@ -20,11 +20,13 @@ public:
 
   
   void clearGradients();
-  
+
+  // This does a forward roll out where the start state is x0 and the final state is x_{num_steps}.
+  // gt_list is the target states for steps [1,num_steps] so doesn't compute a loss against x0
   virtual void forward_backward(const VectorF &x0,
 				const std::vector<VectorF> &gt_list,
 				VectorF &gradient,
-				float &loss);
+				double &loss);
   
 private:
   void precomputePartialLossState();      // Partial of Loss wrt the current state
@@ -32,10 +34,10 @@ private:
   void precomputePartialStateParams();    // Partial of state wrt the params
   void precomputePartialLossParams();     // Partial of loss wrt the params L(theta,x) = loss
   
-  CppAD::ADFun<float> m_partial_loss_params;
-  CppAD::ADFun<float> m_partial_loss_state;
-  CppAD::ADFun<float> m_partial_state_prev_state;
-  CppAD::ADFun<float> m_partial_state_params;
+  CppAD::ADFun<double> m_partial_loss_params;
+  CppAD::ADFun<double> m_partial_loss_state;
+  CppAD::ADFun<double> m_partial_state_prev_state;
+  CppAD::ADFun<double> m_partial_state_params;
 };
 
 } //cpp_bptt

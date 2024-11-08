@@ -72,6 +72,6 @@ Scalar CircleSystem<Scalar>::loss(const VectorS &gt_vec, VectorS &vec)
 
 
 
-template class CircleSystem<float>;
+template class CircleSystem<double>;
 template class CircleSystem<ADF>;
 template class CircleSystem<ADAD>;

@@ -66,6 +66,6 @@ void NormLayer<Scalar>::getParams(Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& para
 
 }
 
-template class NormLayer<float>;
+template class NormLayer<double>;
 template class NormLayer<ADF>;
 template class NormLayer<ADAD>;

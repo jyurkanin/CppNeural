@@ -9,7 +9,7 @@ namespace cpp_bptt
 class SimulatorSimpleSystem : public SimulatorF
 {
 public:
-  SimulatorSimpleSystem(std::shared_ptr<System<float>> sys);
+  SimulatorSimpleSystem(std::shared_ptr<System<double>> sys);
   ~SimulatorSimpleSystem();
     
   void computePartials(const VectorF &xk0,
@@ -20,7 +20,7 @@ public:
 		       VectorF &partial_state_param,
 		       VectorF &partial_loss_params,
 		       VectorF &partial_loss_state,
-		       float   &loss);
+		       double   &loss);
 
 };
 

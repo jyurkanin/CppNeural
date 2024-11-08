@@ -15,8 +15,8 @@ public:
   int del();
   void loop();
   void drawODEs();
-  void drawCircle(float radius);
-  void drawPixel(float x, float y, float red, float green, float blue);
+  void drawCircle(double radius);
+  void drawPixel(double x, double y, double red, double green, double blue);
   void train();
   
   
@@ -33,9 +33,9 @@ private:
   int m_cnt_2 = 0;
   
   static constexpr int m_update_interval = 16;
-  static constexpr float m_target_radius = 0.316227f;
-  static constexpr float m_lr = 1e-3f;
-  static constexpr float m_step_size = 1e-1f;
+  static constexpr double m_target_radius = 0.316227f;
+  static constexpr double m_lr = 1e-3f;
+  static constexpr double m_step_size = 1e-1f;
   static constexpr int m_num_draw_steps = 40000;
   static constexpr int m_num_train_steps = 4000;
   static constexpr int m_batch_size = 4;
@@ -49,6 +49,6 @@ private:
   MatrixF m_x0;
   MatrixF m_new_x0;
 
-  std::shared_ptr<CircleSystem<float>> m_system;
+  std::shared_ptr<CircleSystem<double>> m_system;
   std::shared_ptr<CircleSimulator>     m_simulator;
 };

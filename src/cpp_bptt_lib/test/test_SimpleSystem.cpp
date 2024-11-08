@@ -24,7 +24,7 @@ namespace {
     
     std::shared_ptr<SimpleSystem<ADF>>     m_system_adf;
     std::shared_ptr<SimulatorAD>           m_simulator_adf;
-    std::shared_ptr<SimpleSystem<float>>   m_system_f;
+    std::shared_ptr<SimpleSystem<double>>   m_system_f;
     std::shared_ptr<SimulatorSimpleSystem> m_simulator_f;
     
     SimpleSystemFixture()
@@ -34,7 +34,7 @@ namespace {
       m_system_adf = std::make_shared<SimpleSystem<ADF>>();
       m_simulator_adf = std::make_shared<SimulatorAD>(m_system_adf);
       
-      m_system_f = std::make_shared<SimpleSystem<float>>();
+      m_system_f = std::make_shared<SimpleSystem<double>>();
       m_simulator_f = std::make_shared<SimulatorSimpleSystem>(m_system_f);
 
       m_params = VectorF::Random(m_system_adf->getNumParams());
@@ -84,7 +84,7 @@ namespace {
 	loss[0] += m_system_adf->loss(m_gt_list_adf[i], x_list[i]);
       }
       
-      CppAD::ADFun<float> func(params, loss);
+      CppAD::ADFun<double> func(params, loss);
       
       VectorF y0(1);
       y0[0] = 1;
@@ -102,7 +102,7 @@ namespace {
       m_system_adf->setParams(params);
       
       VectorF gradient;
-      float loss;
+      double loss;
             
       VectorF x0_f(m_system_adf->getStateDim());
       for(int i = 0; i < x0_f.size(); i++)
@@ -132,7 +132,7 @@ namespace {
       m_system_f->setParams(params);
       
       VectorF gradient;
-      float loss;
+      double loss;
       
       m_simulator_f->forward_backward(x0, m_gt_list, gradient, loss);
       

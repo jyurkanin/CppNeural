@@ -3,6 +3,6 @@ Also I made a library for backpropagation through time for optimizing neural ODE
 The generated code has no unrolled loops which makes compilation much faster. With huge unrolled loops, compiling can take like 20mins
 because the generated code is like 100kloc.
 No adjoint method (cringe)
-A cool demo
-Good luck
+A cool demo that draws a circle
+
 

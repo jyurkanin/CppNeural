@@ -63,6 +63,6 @@ void FinalLayer<Scalar>::setParams(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1
 }
 
 
-template class FinalLayer<float>;
+template class FinalLayer<double>;
 template class FinalLayer<ADF>;
 template class FinalLayer<ADAD>;

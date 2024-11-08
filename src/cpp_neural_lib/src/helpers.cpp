@@ -19,7 +19,7 @@ void applyTanh(Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> &mat)
 
 }
 
-template void applyTanh(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> &mat);
+template void applyTanh(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &mat);
 template void applyTanh(Eigen::Matrix<ADF,   Eigen::Dynamic, Eigen::Dynamic> &mat);
 template void applyTanh(Eigen::Matrix<ADAD,  Eigen::Dynamic, Eigen::Dynamic> &mat);
 
@@ -38,7 +38,7 @@ void applyRelu(Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> &mat)
     }
 }
 
-template void applyRelu(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> &mat);
+template void applyRelu(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &mat);
 template void applyRelu(Eigen::Matrix<ADF,   Eigen::Dynamic, Eigen::Dynamic> &mat);
 template void applyRelu(Eigen::Matrix<ADAD,  Eigen::Dynamic, Eigen::Dynamic> &mat);
 
@@ -56,7 +56,7 @@ Scalar computeNorm(Eigen::Matrix<Scalar, Eigen::Dynamic,1> &vec)
   return CppAD::sqrt(sum);
 }
 
-template float computeNorm(Eigen::Matrix<float, Eigen::Dynamic,1> &vec);
+template double computeNorm(Eigen::Matrix<double, Eigen::Dynamic,1> &vec);
 template ADF   computeNorm(Eigen::Matrix<ADF,   Eigen::Dynamic,1> &vec);
 template ADAD  computeNorm(Eigen::Matrix<ADAD,  Eigen::Dynamic,1> &vec);
 

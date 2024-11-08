@@ -8,6 +8,11 @@ set(CMAKE_CXX_FLAGS_RELEASE_INIT "-Wall -Ofast -mtune=native -march=native -DNDE
 set(CMAKE_CXX_STANDARD 17)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
+add_compile_options(
+  "-Wall" "-Ofast" "-mtune=native" "-march=native" "-DNDEBUG"
+)
+
+
 include_directories(/usr/include/eigen3)
 include(GNUInstallDirs)
 

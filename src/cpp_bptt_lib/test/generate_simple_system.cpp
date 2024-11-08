@@ -35,7 +35,7 @@ int main2()
   
   system->setParams(theta_adf);
   loss_adf[0] = system->loss(xk1_gt_adf, xk1_adf);
-  CppAD::ADFun<float> partial_loss_params_adf(theta_adf, loss_adf);
+  CppAD::ADFun<double> partial_loss_params_adf(theta_adf, loss_adf);
   partial_loss_params_adf.optimize(); //Probably will segfault.
 
   VectorF y0_f(1); y0_f[0] = 1;

@@ -42,19 +42,19 @@ public:
     { 
       integrate(xk, xk1);
       xk = xk1;
-      x_list[i] = xk;
+      x_list[i] = xk1;
     }
   }
   
   virtual void forward_backward(const VectorF &x0,
 				const std::vector<VectorF> &gt_list,
 				VectorF &gradient,
-				float &loss) = 0;
+				double &loss) = 0;
   
   void train(const VectorF &x0, const std::vector<VectorF> &gt_list)
   {
     VectorF gradient;
-    float loss;
+    double loss;
     
     forward_backward(x0, gt_list, gradient, loss);
     m_params -= gradient * m_system->getLearningRate();
@@ -63,7 +63,7 @@ public:
   /// @param theta params
   /// @param Xk This is a tensor of shape (num_samples, state_dim)
   /// @param Xk1 same as Xk but the next discrete time step
-  void integrate(const VectorS &Xk, VectorS &Xk1)
+  virtual void integrate(const VectorS &Xk, VectorS &Xk1)
   {
     rk4(Xk, Xk1);
   }
@@ -71,7 +71,7 @@ public:
   std::shared_ptr<System<Scalar>> getSystem() { return m_system; }
   void setParams(const VectorS &params) { m_system->setParams(params); }
 protected:
-  float m_timestep;
+  double m_timestep;
   int   m_num_steps;
   int   m_control_dim;
   int   m_state_dim;

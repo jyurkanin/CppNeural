@@ -9,7 +9,7 @@ MainWindow::MainWindow()
   int argc = 0;
   char **argv = 0;
 
-  m_system = std::make_shared<CircleSystem<float>>();
+  m_system = std::make_shared<CircleSystem<double>>();
   m_system->setNumSteps(m_num_train_steps);
   m_system->setTimestep(.1);
   m_system->setLearningRate(m_lr);
@@ -27,10 +27,10 @@ MainWindow::MainWindow()
   
   m_x0 = 2*MatrixF::Random(m_state_dim, m_batch_size) - (MatrixF::Ones(m_state_dim, m_batch_size));
 
-  float starting_radius = .1;
+  double starting_radius = .1;
   for(int i = 0; i < m_x0.cols(); i++)
   {
-    float norm = (m_x0(0,i)*m_x0(0,i)) + (m_x0(1,i)*m_x0(1,i));
+    double norm = (m_x0(0,i)*m_x0(0,i)) + (m_x0(1,i)*m_x0(1,i));
     m_x0(0,i) = starting_radius*m_x0(0,i)/norm;
     m_x0(1,i) = starting_radius*m_x0(1,i)/norm;
   }
@@ -89,7 +89,7 @@ void MainWindow::train()
   std::vector<VectorF> gt_list(m_system->getNumSteps());
   VectorF d_params(m_system->getNumParams());
   VectorF d_params_sum = VectorF::Zero(m_system->getNumParams());
-  float loss;
+  double loss;
   
   for(int i = 0; i < gt_list.size(); i++)
   {
@@ -169,9 +169,9 @@ void MainWindow::drawODEs()
 
       }
       
-      float red = ((float)j / m_batch_size);
-      float green = 1 - red;
-      float blue = 0;
+      double red = ((double)j / m_batch_size);
+      double green = 1 - red;
+      double blue = 0;
       drawPixel(x_k1[0], x_k1[1], red,green,blue);
 
       x_k = x_k1;
@@ -181,17 +181,17 @@ void MainWindow::drawODEs()
   m_cnt++;
 }
 
-void MainWindow::drawCircle(float radius)
+void MainWindow::drawCircle(double radius)
 {
-  for(float i = 0; i < 7; i+=.01)
+  for(double i = 0; i < 7; i+=.01)
   {
     drawPixel(radius*cosf(i), radius*sinf(i), 0,0,1);
   }
 }
 
-void MainWindow::drawPixel(float x, float y, float red, float green, float blue)
+void MainWindow::drawPixel(double x, double y, double red, double green, double blue)
 {
-  const float scale = 300;
+  const double scale = 300;
   int row = std::max(std::min((int) (y*scale) + (m_height/2), m_height), 0);
   int col = std::max(std::min((int) (x*scale) + (m_width/2), m_width), 0);
 

@@ -21,6 +21,6 @@ int BaseLayer<Scalar>::getNumOutputs(){return m_num_out;}
 
 
 
-template class BaseLayer<float>;
+template class BaseLayer<double>;
 template class BaseLayer<ADF>;
 template class BaseLayer<ADAD>;

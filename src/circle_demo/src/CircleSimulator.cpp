@@ -1,16 +1,16 @@
 #include "CircleSimulator.h"
 
-CircleSimulator::CircleSimulator(std::shared_ptr<cpp_bptt::System<float>> sys) : cpp_bptt::SimulatorF(sys){}
+CircleSimulator::CircleSimulator(std::shared_ptr<cpp_bptt::System<double>> sys) : cpp_bptt::SimulatorF(sys){}
 CircleSimulator::~CircleSimulator() {}
 
 void CircleSimulator::computePartialLossState(const VectorF &gt_x1,
 					      const VectorF &x1,
 					      VectorF &loss_x1_partial,
-					      float &loss)
+					      double &loss)
 {
-  float x[4];
-  float y[3];
-  float v[10];
+  double x[4];
+  double y[3];
+  double v[10];
   
   int idx = 0;
   for(int i = 0; i < gt_x1.size(); i++)
@@ -69,11 +69,11 @@ void CircleSimulator::computePartials(const VectorF &xk0,
 				      VectorF &partial_state_param,
 				      VectorF &partial_loss_params,
 				      VectorF &partial_loss_state,
-				      float   &loss)
+				      double   &loss)
 {
-   float x[38];
-   float y[111];
-   float v[72];
+   double x[38];
+   double y[111];
+   double v[72];
    
    int idx = 0;
    for(int i = 0; i < xk0.size(); i++)

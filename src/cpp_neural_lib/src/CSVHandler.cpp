@@ -2,7 +2,7 @@
 
 
 namespace CSV{
-  void load_csv(std::string fn, Eigen::Matrix<float,Eigen::Dynamic,1> &params){
+  void load_csv(std::string fn, Eigen::Matrix<double,Eigen::Dynamic,1> &params){
     std::ifstream csv_file(fn);
     
     char comma;
@@ -14,7 +14,7 @@ namespace CSV{
     csv_file.close();
   }
   
-  void write_csv(std::string fn, const Eigen::Matrix<float,Eigen::Dynamic,1> &params){
+  void write_csv(std::string fn, const Eigen::Matrix<double,Eigen::Dynamic,1> &params){
     std::ofstream csv_file(fn);
     
     char comma = ',';

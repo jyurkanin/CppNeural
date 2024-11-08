@@ -59,7 +59,7 @@ Scalar SimpleSystem<Scalar>::loss(const VectorS &gt_vec, VectorS &vec)
 }
 
 
-template class SimpleSystem<float>;
+template class SimpleSystem<double>;
 template class SimpleSystem<ADF>;
 template class SimpleSystem<ADAD>;
 

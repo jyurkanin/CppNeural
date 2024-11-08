@@ -64,13 +64,13 @@ void Generator::generatePartialLossState()
   std::vector<CGF> input_vars(system->getStateDim()*2); // x0_gt.size() + x0.size()
   std::vector<CGF> output_vars(y_all_adcf.size());  // gradient size+ loss
   
-  CppAD::cg::CodeHandler<float> handler;
+  CppAD::cg::CodeHandler<double> handler;
   handler.setVerbose(true);
   handler.makeVariables(input_vars);
   output_vars = func_final.Forward(0, input_vars);
   
-  CppAD::cg::LanguageC<float> langC("float");
-  CppAD::cg::LangCDefaultVariableNameGenerator<float> name_gen;
+  CppAD::cg::LanguageC<double> langC("double");
+  CppAD::cg::LangCDefaultVariableNameGenerator<double> name_gen;
   std::ostringstream code;
   handler.generateCode(code, langC, output_vars, name_gen);
   
@@ -79,10 +79,10 @@ void Generator::generatePartialLossState()
     "computePartialLossState(const VectorF &gt_x1,\n"
     "                        const VectorF &x1,\n"
     "                        VectorF &loss_x1_partial,\n"
-    "                        float &loss)\n"
+    "                        double &loss)\n"
     "{\n";
-  output_file << "  float x[" << input_vars.size() <<"];\n";
-  output_file << "  float y[" << output_vars.size() <<"];\n";
+  output_file << "  double x[" << input_vars.size() <<"];\n";
+  output_file << "  double y[" << output_vars.size() <<"];\n";
   output_file <<
     "  int idx = 0;\n"
     "  for(int i = 0; i < gt_x1.size(); i++)\n"
@@ -109,6 +109,7 @@ void Generator::generatePartialLossState()
   output_file.close();
 }
 
+  
 void Generator::generatePartials()
 {
   std::shared_ptr<System<ADAD>> system = m_simulator->getSystem();
@@ -121,18 +122,22 @@ void Generator::generatePartials()
   VectorADAD xk1_gt_adad(system->getStateDim());
   VectorADAD loss_adad(1);
   
+  system->getDefaultInitialState(xk0_adad);
   CppAD::Independent(xk0_adad, theta_adad);
   system->setParams(theta_adad);
   m_simulator->integrate(xk0_adad, xk1_adad);
   CppAD::ADFun<ADCF> partial_state_prev_state_adcf(xk0_adad, xk1_adad);
   partial_state_prev_state_adcf.optimize(); //Probably will segfault.
-    
+
+  system->getDefaultParams(theta_adad);
+  system->getDefaultInitialState(xk0_adad);
   CppAD::Independent(theta_adad, xk0_adad);
   system->setParams(theta_adad);
   m_simulator->integrate(xk0_adad, xk1_adad);
   CppAD::ADFun<ADCF> partial_state_params_adcf(theta_adad, xk1_adad);
   partial_state_params_adcf.optimize(); //Probably will segfault.
 
+  system->getDefaultInitialState(xk1_adad);
   VectorADAD loss_state_dynamic_vars_adad(theta_adad.size() + xk1_gt_adad.size());
   CppAD::Independent(xk1_adad, loss_state_dynamic_vars_adad);
   
@@ -172,10 +177,11 @@ void Generator::generatePartials()
   system->setParams(theta_adad);
   loss_adad[0] = system->loss(xk1_gt_adad, xk1_adad);
   CppAD::ADFun<ADCF> partial_loss_params_adcf(theta_adad, loss_adad);
-  //partial_loss_params_adcf.optimize(); //Probably will segfault.
+  partial_loss_params_adcf.optimize(); //Probably will segfault.
   //==================================================================================
   
   // 2nd. Use the ADCF function's reverse and forward to compute a CGF forward function
+  system->getDefaultParams(theta_adad); // This Resets theta_adad to default
   VectorADCF xk0_adcf(system->getStateDim());
   VectorADCF theta_adcf(system->getNumParams());
   VectorADCF xk1_gt_adcf(system->getStateDim());
@@ -194,6 +200,18 @@ void Generator::generatePartials()
 			loss_params_gradient_adcf.size() +
 			loss_state_gradient_adcf.size() +
 			loss_adcf.size());
+
+  idx = 0;
+  for(int i = 0; i < xk0_adcf.size(); i++)
+  {
+    x_all_adcf[idx+i] = CppAD::Value(xk0_adad[i]);
+  }
+  idx += xk0_adcf.size();
+  for(int i = 0; i < theta_adcf.size(); i++)
+  {
+    x_all_adcf[idx+i] = CppAD::Value(theta_adad[i]); //asdasd
+  }
+  idx += theta_adcf.size();
 
   
   CppAD::Independent(x_all_adcf);
@@ -306,13 +324,13 @@ void Generator::generatePartials()
   std::vector<CGF> input_vars(x_all_adcf.size());
   std::vector<CGF> output_vars(y_all_adcf.size());
   
-  CppAD::cg::CodeHandler<float> handler;
+  CppAD::cg::CodeHandler<double> handler;
   handler.setVerbose(true);
   handler.makeVariables(input_vars);
   output_vars = func_final.Forward(0, input_vars);
   
-  CppAD::cg::LanguageC<float> langC("float");
-  CppAD::cg::LangCDefaultVariableNameGenerator<float> name_gen;
+  CppAD::cg::LanguageC<double> langC("double");
+  CppAD::cg::LangCDefaultVariableNameGenerator<double> name_gen;
   std::ostringstream code;
   handler.generateCode(code, langC, output_vars, name_gen);
   
@@ -326,10 +344,10 @@ void Generator::generatePartials()
     "                     VectorF &partial_state_param,\n"
     "                     VectorF &partial_loss_params,\n"
     "                     VectorF &partial_loss_state,\n"
-    "                     float   &loss)\n"
+    "                     double   &loss)\n"
     "{\n";
-  output_file << "   float x[" << input_vars.size() <<"];\n";
-  output_file << "   float y[" << output_vars.size() <<"];\n";
+  output_file << "   double x[" << input_vars.size() <<"];\n";
+  output_file << "   double y[" << output_vars.size() <<"];\n";
   output_file << "   int idx = 0;\n"
     "   for(int i = 0; i < xk0.size(); i++)\n"
     "   {\n"
@@ -442,19 +460,19 @@ void Generator::generatePartialStatePrevState()
   std::vector<CGF> input_vars(x_all_adcf.size());
   std::vector<CGF> output_vars(y_all_adcf.size());
   
-  CppAD::cg::CodeHandler<float> handler;
+  CppAD::cg::CodeHandler<double> handler;
   handler.setVerbose(true);
   handler.makeVariables(input_vars);
   output_vars = func_final.Forward(0, input_vars);
   
-  CppAD::cg::LanguageC<float> langC("float");
-  CppAD::cg::LangCDefaultVariableNameGenerator<float> name_gen;
+  CppAD::cg::LanguageC<double> langC("double");
+  CppAD::cg::LangCDefaultVariableNameGenerator<double> name_gen;
   std::ostringstream code;
   handler.generateCode(code, langC, output_vars, name_gen);
   
   std::ofstream output_file("partial_state_prev_state.cpp");
-  output_file << "float x[" << input_vars.size() <<"]\n";
-  output_file << "float y[" << output_vars.size() <<"]\n";
+  output_file << "double x[" << input_vars.size() <<"]\n";
+  output_file << "double y[" << output_vars.size() <<"]\n";
   output_file << code.str();
   output_file.close();
 }
@@ -508,19 +526,19 @@ void Generator::generatePartialStateParams()
   std::vector<CGF> input_vars(x_all_adcf.size()); // x0_gt.size() + x0.size()
   std::vector<CGF> output_vars(y_all_adcf.size());  // gradient size+ loss
   
-  CppAD::cg::CodeHandler<float> handler;
+  CppAD::cg::CodeHandler<double> handler;
   handler.setVerbose(true);
   handler.makeVariables(input_vars);
   output_vars = func_final.Forward(0, input_vars);
   
-  CppAD::cg::LanguageC<float> langC("float");
-  CppAD::cg::LangCDefaultVariableNameGenerator<float> name_gen;
+  CppAD::cg::LanguageC<double> langC("double");
+  CppAD::cg::LangCDefaultVariableNameGenerator<double> name_gen;
   std::ostringstream code;
   handler.generateCode(code, langC, output_vars, name_gen);
   
   std::ofstream output_file("partial_state_params.cpp");
-  output_file << "float x[" << input_vars.size() <<"]\n";
-  output_file << "float y[" << output_vars.size() <<"]\n";
+  output_file << "double x[" << input_vars.size() <<"]\n";
+  output_file << "double y[" << output_vars.size() <<"]\n";
   output_file << code.str();
   output_file.close();  
 }
